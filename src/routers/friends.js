@@ -10,9 +10,9 @@ const router = new express.Router()
 //     }
 // })
 
-router.get('/friends/findFriend', auth, async (req, res) => {
+router.post('/friends/findFriend', auth, async (req, res) => {
     const searchQuery = req.body.searchQuery
-    console.log(searchQuery)
+
     try {
         const matches = await User.find({
             $or: [
@@ -22,9 +22,10 @@ router.get('/friends/findFriend', auth, async (req, res) => {
         },
             { _id: 1, email: 1, username: 1 }
         )
-        console.log(matches)
-    } catch (e) {
 
+        res.status(200).send(matches)
+    } catch (e) {
+        res.status(400).send({ error: "Something went wrong. Please try again." })
     }
 })
 

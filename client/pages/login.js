@@ -25,7 +25,7 @@ export default function Login() {
 
             }
         }
-        localStorage.getItem('token') && fetchUser()
+        token && fetchUser()
     }, [])
 
 
