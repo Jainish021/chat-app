@@ -2,6 +2,7 @@ const express = require("express")
 const multer = require("multer")
 const sharp = require("sharp")
 const User = require("../models/user")
+const Friends = require("../models/friends")
 const auth = require("../middleware/auth")
 const { sendWelcomeEmail, sendCancellationEmail } = require("../emails/account")
 const router = new express.Router()
@@ -18,10 +19,12 @@ router.post('/users', async (req, res) => {
 
     const { password2, ...userData } = req.body
     const user = new User(userData)
+    const friends = new Friends({ userId: user._id })
     try {
         const token = await user.generateAuthToken()
         user.tokens.token = token
         await user.save()
+        await friends.save()
         sendWelcomeEmail(user.email, user.username)
         res.status(200).send({ user, token })
     } catch (e) {

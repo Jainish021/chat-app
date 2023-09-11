@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
@@ -17,7 +18,6 @@ export default function FriendSearch(props) {
                     if (!searchResult.error) {
                         setErrorLabel("")
                         setList(searchResult)
-                        console.log(searchResult)
                     } else {
                         setErrorLabel(searchResult.error)
                     }
@@ -26,7 +26,7 @@ export default function FriendSearch(props) {
                 }
             }
             token && searchQuery && fetchList()
-        }, 1000)
+        }, 500)
 
         return () => clearTimeout(timeoutId)
     }, [searchQuery])
@@ -37,18 +37,36 @@ export default function FriendSearch(props) {
     }, [list])
 
 
+    async function addUser(friendId) {
+        try {
+            const result = await axios.post("/friends/addFriend", { friendId }).then(res => res.data)
+            console.log(result)
+        } catch (e) {
+
+        }
+    }
+
     function SearchResult() {
         if (list.length > 0) {
+            setErrorLabel("")
             const searchList = list.map(listItem => (
                 <div
                     key={listItem._id}
-                    className='flex flex-row px-[5%] py-[1%] bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
+                    className='flex flex-row px-5 py-1 bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
+                    onClick={() => addUser(listItem._id)}
                 >
-                    <div>
+                    <Image
+                        src={listItem.avatar || '/userImage.png'}
+                        width={40}
+                        height={30}
+                        alt=''
+                        className='rounded-full bg-white m-2'
+                    ></Image >
+                    <div className='m-1'>
                         <p>Username:</p>
                         <p>Email:</p>
                     </div>
-                    <div className='mx-[10%] text-violet-500'>
+                    <div className='mx-10 text-violet-500'>
                         <p>{listItem.username}</p>
                         <p>{listItem.email}</p>
                     </div>
@@ -74,7 +92,7 @@ export default function FriendSearch(props) {
                     &larr;
                 </p>
                 <input
-                    className='w-[90%] mx-[5%] my-[5%] py-[1%] px-[2%] bg-gray-800 rounded-md caret-slate-300 text-slate-300'
+                    className='w-[90%] mx-5 my-5 py-1 px-2 bg-gray-800 rounded-md caret-slate-300 text-slate-300'
                     placeholder='Search by username or email'
                     onChange={(e) => setSearchQuery(e.target.value)}
                     value={searchQuery}

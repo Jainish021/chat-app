@@ -4,8 +4,7 @@ const User = require("./user")
 const friendsSchema = mongoose.Schema({
     friends: [{
         friend: {
-            type: String,
-            required: true
+            type: String
         }
     }],
     userId: {
@@ -16,3 +15,7 @@ const friendsSchema = mongoose.Schema({
 }, {
     timestamps: true
 })
+
+const Friends = mongoose.model('Friends', friendsSchema)
+
+module.exports = Friends
