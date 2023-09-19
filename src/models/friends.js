@@ -16,6 +16,17 @@ const friendsSchema = mongoose.Schema({
     timestamps: true
 })
 
+friendsSchema.methods.addVirtualToFriends = function () {
+    return this.friends.map(friend => {
+
+        const virtualProperty = User.findById(id)
+        return {
+            ...friend.toObject(),
+            virtualProperty,
+        }
+    })
+}
+
 const Friends = mongoose.model('Friends', friendsSchema)
 
 module.exports = Friends

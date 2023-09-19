@@ -2,24 +2,28 @@ const express = require("express")
 const User = require("../models/user")
 const Friends = require("../models/friends")
 const auth = require("../middleware/auth")
-const { model } = require("mongoose")
+const { model, mongo, default: mongoose } = require("mongoose")
 const router = new express.Router()
 
 router.post('/friends/addFriend', auth, async (req, res) => {
-    const friendId = req.body.friendId
+    const friendId = req.body.friendId.toString()
+    console.log(friendId)
     try {
-        console.log(req.user._id)
-        console.log(friendId)
-        const friendList = Friends.where({ userId: req.user._id }).findOne()
-        console.log(friendList.userId)
-        friendList.friends = friendList.friends ? friendList.friends.concat({ friendId }) : friendList.friends.concat({ friendId })
+        const friend = await Friends.findOne({ 'userId': req.user._id, 'friends.friend': friendId })
 
-        console.log(friendList.friends)
+        if (friend) {
+            res.status(200).send({ error: "User is already added." })
+            return
+        }
+
+        const friendList = await Friends.findOne({ userId: req.user._id.toString() })
+        friendList.friends = friendList.friends.concat({ friend: friendId })
         await friendList.save()
-        console.log(friendList)
+
         res.status(200).send({ error: "User added successfully" })
+
     } catch (e) {
-        res.status(400).send({ error: "Failed to add the user" })
+        res.status(200).send({ error: "Failed to add the user" })
     }
 })
 
@@ -48,5 +52,43 @@ router.post('/friends/findFriend', auth, async (req, res) => {
         res.status(400).send({ error: "Something went wrong. Please try again." })
     }
 })
+
+router.get('/friends', auth, async (req, res) => {
+    try {
+        const friendIds = await Friends.aggregate([
+            {
+                $match: { userId: req.user._id },
+            },
+            {
+                $unwind: '$friends',
+            },
+            {
+                $project: {
+                    friend: '$friends.friend',
+                    _id: 0,
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    friendIds: { $push: '$friend' },
+                },
+            }
+        ])
+
+        if (friendIds.length === 0) {
+            res.status(200).send({})
+            return
+        }
+        // console.log(friendIds)
+
+        const friendUsers = await User.find({ _id: { $in: friendIds[0].friendIds } }).select('-password -tokens -createdAt -updatedAt -__v')
+        res.status(200).send(friendUsers)
+
+    } catch (e) {
+        res.status(200).send({ error: "Something went wrong! Could not fetch data." })
+    }
+})
+
 
 module.exports = router

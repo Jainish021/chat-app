@@ -1,28 +1,91 @@
 import Header from "./Header"
 import FriendSearch from './FriendSearch'
-import { useState } from "react"
+import { useRouter } from 'next/router'
+import Image from "next/image"
+import { useEffect, useState } from "react"
+import axios from "axios"
 
 export default function Sidebar() {
+    const router = useRouter()
     const [friendSearchVisibility, setFriendSearchVisibility] = useState(false)
+    const [list, setList] = useState([])
+
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        axios.defaults.headers.common['Authorization'] = token
+
+        if (!token) {
+            router.push('/login')
+        }
+
+        const fetchList = async () => {
+            try {
+                const res = await axios.get("/friends").then(res => res.data)
+                if (res.error) {
+                    router.push('/login')
+                }
+                setList(res)
+            } catch (e) {
+                router.push('/login')
+            }
+        }
+
+        token && !friendSearchVisibility && fetchList()
+    }, [friendSearchVisibility])
 
     function friendSearch() {
         setFriendSearchVisibility(prev => !prev)
+    }
+
+
+    function AddFriend() {
+        return (
+            <div className="flex flex-col min-h-[calc(100vh-120px)] items-center text-slate-300">
+                <p
+                    className='w-[30%] p-[5%] my-auto text-center align-middle bg-violet-700 rounded-lg transition-transform transform hover:scale-110 focus:outline-none active:scale-100'
+                    onClick={friendSearch}
+                >Add Friends</p>
+            </div>
+        )
+    }
+
+    function Friends() {
+        const friendsList = list.map(listItem => (
+            <div
+                key={listItem._id}
+                className='flex flex-row px-[5%] py-[1%] bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
+            >
+                <Image
+                    src={listItem.avatar || '/userImage.png'}
+                    width={40}
+                    height={30}
+                    alt=''
+                    className='rounded-full bg-white m-[2%] w-auto h-auto'
+                    loading="lazy"
+                ></Image >
+                <div className='text-xl mx-[10%] my-auto'>
+                    <p>{listItem.username}</p>
+                </div>
+            </div>
+        ))
+
+        return (
+            friendsList
+        )
     }
 
     return (
         <>
             {
                 friendSearchVisibility ?
-                    <FriendSearch friendSearch={friendSearch} />
+                    <FriendSearch
+                        friendSearch={friendSearch}
+                        setFriendSearchVisibility={setFriendSearchVisibility}
+                    />
                     :
                     <>
                         <Header friendSearch={friendSearch} />
-                        <div className="h-14 bg-gray-800 border-b border-slate-600 px-1"></div>
-                        <div className="h-14 bg-gray-800 border-b border-slate-600"></div>
-                        <div className="h-14 bg-gray-800 border-b border-slate-600"></div>
-                        <div className="h-14 bg-gray-800 border-b border-slate-600"></div>
-                        <div className="h-14 bg-gray-800 border-b border-slate-600"></div>
-                        <div className="h-14 bg-gray-800 border-b border-slate-600"></div>
+                        {list.length > 0 ? <Friends /> : <AddFriend />}
                     </>
             }
         </>

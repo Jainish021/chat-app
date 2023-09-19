@@ -1,11 +1,12 @@
-import Head from 'next/head'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useDispatch, useSelector } from 'react-redux'
-import { setSharedData } from '../slices/sharedDataSlice'
-import Sidebar from '../components/Sidebar'
+import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import axios from "axios"
 import Loading from "../components/Loading"
+import Sidebar from '../components/Sidebar'
+import Chatbox from '../components/Chatbox'
+import HeadComponent from '../components/HeadComponent'
 
 
 export default function Chat() {
@@ -47,17 +48,14 @@ export default function Chat() {
                 :
                 (
                     <>
-                        <Head>
-                            <title>Chat App</title>
-                            {/* <Link rel="icon" href="/img/favicon.png" /> */}
-                        </Head>
+                        <HeadComponent />
                         <section className='bg-gray-900 overflow-auto min-h-screen'>
                             <div className="flex flex-row items-center justify-center divide-x-4 divide-gray-900 mx-[20px] my-[20px]">
                                 <div className='w-1/4 bg-gray-700 min-h-[calc(100vh-40px)]'>
                                     <Sidebar />
                                 </div>
-                                <div className='float-left w-3/4 bg-gray-700 min-h-[calc(100vh-40px)]'>
-
+                                <div className='float-left w-3/4 bg-gray-800 min-h-[calc(100vh-40px)]'>
+                                    <Chatbox />
                                 </div>
                             </div>
                         </section>

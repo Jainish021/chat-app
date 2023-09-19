@@ -33,52 +33,55 @@ export default function FriendSearch(props) {
 
 
     useEffect(() => {
-        SearchResult()
+        if (list.length > 0) {
+            setErrorLabel("")
+            SearchResult()
+        } else if (searchQuery && list.length == 0) {
+            setErrorLabel("No matching user found.")
+        }
+
     }, [list])
 
 
     async function addUser(friendId) {
         try {
-            const result = await axios.post("/friends/addFriend", { friendId }).then(res => res.data)
-            console.log(result)
-        } catch (e) {
+            await axios.post("/friends/addFriend", { friendId })
+            props.setFriendSearchVisibility(false)
 
+        } catch (e) {
+            console.log("Failed to add user")
         }
     }
 
     function SearchResult() {
-        if (list.length > 0) {
-            setErrorLabel("")
-            const searchList = list.map(listItem => (
-                <div
-                    key={listItem._id}
-                    className='flex flex-row px-5 py-1 bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
-                    onClick={() => addUser(listItem._id)}
-                >
-                    <Image
-                        src={listItem.avatar || '/userImage.png'}
-                        width={40}
-                        height={30}
-                        alt=''
-                        className='rounded-full bg-white m-2'
-                    ></Image >
-                    <div className='m-1'>
-                        <p>Username:</p>
-                        <p>Email:</p>
-                    </div>
-                    <div className='mx-10 text-violet-500'>
-                        <p>{listItem.username}</p>
-                        <p>{listItem.email}</p>
-                    </div>
-                </div >
-            ))
+        const searchList = list.map(listItem => (
+            <div
+                key={listItem._id}
+                className='flex flex-row px-[5%] py-[1%] bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
+                onClick={() => addUser(listItem._id)}
+            >
+                <Image
+                    src={listItem.avatar || '/userImage.png'}
+                    width={40}
+                    height={30}
+                    alt=''
+                    className='rounded-full bg-white m-[2%] w-auto h-auto'
+                    loading="lazy"
+                ></Image >
+                <div className='m-[1%]'>
+                    <p>Username:</p>
+                    <p>Email:</p>
+                </div>
+                <div className='mx-[10%] text-violet-500'>
+                    <p>{listItem.username}</p>
+                    <p>{listItem.email}</p>
+                </div>
+            </div >
+        ))
 
-            return (
-                searchList
-            )
-        } else if (searchQuery && list.length == 0) {
-            setErrorLabel("No matching user found.")
-        }
+        return (
+            searchList
+        )
     }
 
 
@@ -96,6 +99,7 @@ export default function FriendSearch(props) {
                     placeholder='Search by username or email'
                     onChange={(e) => setSearchQuery(e.target.value)}
                     value={searchQuery}
+                    autoFocus
                 ></input>
             </div>
             {errorLabel ? <p className='text-center text-amber-400'>{errorLabel}</p> : <SearchResult />}
