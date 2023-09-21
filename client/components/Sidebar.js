@@ -3,10 +3,14 @@ import FriendSearch from './FriendSearch'
 import { useRouter } from 'next/router'
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from 'react-redux'
+import { setSelectedItem } from '../slices/selectedItemSlice'
 import axios from "axios"
 
 export default function Sidebar() {
     const router = useRouter()
+    const dispatch = useDispatch()
+    const selectedItem = useSelector((state) => state.selectedItem)
     const [friendSearchVisibility, setFriendSearchVisibility] = useState(false)
     const [list, setList] = useState([])
 
@@ -49,11 +53,17 @@ export default function Sidebar() {
         )
     }
 
+    function selectChat(item) {
+        dispatch(setSelectedItem(item))
+    }
+
     function Friends() {
         const friendsList = list.map(listItem => (
             <div
                 key={listItem._id}
-                className='flex flex-row px-[5%] py-[1%] bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer'
+                className={`flex flex-row px-[5%] py-[1%] ${selectedItem?._id === listItem._id ? "bg-gray-800" : "bg-gray-700"} focus:bg-gray-800 text-slate-300 border-b border-slate-600 cursor-pointer`}
+                onClick={() => selectChat(listItem)
+                }
             >
                 <Image
                     src={listItem.avatar || '/userImage.png'}
@@ -66,7 +76,7 @@ export default function Sidebar() {
                 <div className='text-xl mx-[10%] my-auto'>
                     <p>{listItem.username}</p>
                 </div>
-            </div>
+            </div >
         ))
 
         return (

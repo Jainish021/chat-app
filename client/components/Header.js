@@ -19,7 +19,7 @@ export default function Header(props) {
     return (
         <>
             <div
-                className='flex flex-row items-center justify-between mx-[10%] my-[4%]'
+                className='flex flex-row items-center justify-between px-[10%] py-[3%] h-[10%] border-b border-slate-600'
             >
                 <Image
                     src={'/userImage.png'}

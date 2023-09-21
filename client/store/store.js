@@ -1,11 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
-import sharedDataReducer from '../slices/sharedDataSlice';
+import { configureStore } from '@reduxjs/toolkit'
+import sharedDataReducer from '../slices/sharedDataSlice'
+import selectedItemReducer from '../slices/selectedItemSlice'
 
 const store = configureStore({
     reducer: {
         sharedData: sharedDataReducer,
-        // Add other slices as needed
+        selectedItem: selectedItemReducer
     },
-});
+})
 
-export default store;
+export default store
