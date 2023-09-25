@@ -1,13 +1,23 @@
 const express = require("express")
 const User = require("../models/user")
 const Friends = require("../models/friends")
+const Chats = require("../models/chats")
 const auth = require("../middleware/auth")
 const { model, mongo, default: mongoose } = require("mongoose")
 const router = new express.Router()
 
 router.post('/friends/addFriend', auth, async (req, res) => {
     const friendId = req.body.friendId.toString()
-    console.log(friendId)
+
+    let chatId = ""
+    if (friendId < req.user._id.toString()) {
+        chatId = friendId + req.user._id.toString()
+    } else {
+        chatId = req.user._id.toString() + friendId
+    }
+
+    const chat = new Chats({ chatId: chatId })
+
     try {
         const friend = await Friends.findOne({ 'userId': req.user._id, 'friends.friend': friendId })
 
@@ -19,6 +29,7 @@ router.post('/friends/addFriend', auth, async (req, res) => {
         const friendList = await Friends.findOne({ userId: req.user._id.toString() })
         friendList.friends = friendList.friends.concat({ friend: friendId })
         await friendList.save()
+        await chat.save()
 
         res.status(200).send({ error: "User added successfully" })
 
@@ -80,7 +91,6 @@ router.get('/friends', auth, async (req, res) => {
             res.status(200).send({})
             return
         }
-        // console.log(friendIds)
 
         const friendUsers = await User.find({ _id: { $in: friendIds[0].friendIds } }).select('-password -tokens -createdAt -updatedAt -__v')
         res.status(200).send(friendUsers)

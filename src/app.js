@@ -6,6 +6,7 @@ const cors = require("cors")
 const mongoose = require("./db/mongoose")
 const userRouter = require("./routers/user")
 const friendsRouter = require("./routers/friends")
+const chatsRouter = require("./routers/chats")
 
 const app = express()
 const server = http.createServer(app)
@@ -14,6 +15,7 @@ const io = socketio(server)
 app.use(express.json())
 app.use(userRouter)
 app.use(friendsRouter)
+app.use(chatsRouter)
 
 if (process.env.NODE_ENV !== "production") {
     app.use(cors())
