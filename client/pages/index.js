@@ -11,5 +11,6 @@ export default function Home() {
         } else {
             router.push("/chat")
         }
+        // eslint-disable-next-line
     }, [])
 }

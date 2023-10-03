@@ -33,6 +33,7 @@ export default function Login() {
             }
         }
         token ? fetchUser() : setIsLoading(false)
+        // eslint-disable-next-line
     }, [])
 
 

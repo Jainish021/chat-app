@@ -75,6 +75,7 @@ export default function Profile(props) {
                         src='/camera.png'
                         width={30}
                         height={30}
+                        alt=''
                     ></Image>
                     <p class="text-violet-700 text-lg font-semibold w-[60%]">Change Profile Photo</p>
                 </div>
@@ -95,6 +96,7 @@ export default function Profile(props) {
                         width={20}
                         height={20}
                         className='ml-[2%]'
+                        alt=''
                     >
                     </Image>
                 </div>

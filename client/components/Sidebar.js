@@ -37,6 +37,7 @@ export default function Sidebar() {
         }
 
         token && !friendSearchVisibility && fetchList()
+        // eslint-disable-next-line
     }, [friendSearchVisibility])
 
     function friendSearch() {

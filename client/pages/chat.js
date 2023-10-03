@@ -47,6 +47,7 @@ export default function Chat() {
 
         token && !userInfo?._id && fetchUserDetails()
         setIsLoading(false)
+        // eslint-disable-next-line
     }, [])
 
     return (

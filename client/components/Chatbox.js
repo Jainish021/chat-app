@@ -20,12 +20,14 @@ export default function Chatbox() {
             setInitState(false)
             fetchMessages()
         }
+        // eslint-disable-next-line
     }, [selectedItem])
 
 
     useEffect(() => {
         DisplayMessage()
         scrollToBottom()
+        // eslint-disable-next-line
     }, [messages])
 
 

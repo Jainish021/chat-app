@@ -39,7 +39,7 @@ export default function FriendSearch(props) {
         } else if (searchQuery && list.length == 0) {
             setErrorLabel("No matching user found.")
         }
-
+        // eslint-disable-next-line
     }, [list])
 
 

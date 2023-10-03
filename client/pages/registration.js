@@ -34,6 +34,7 @@ export default function Registration() {
             }
         }
         token ? fetchUser() : setIsLoading(false)
+        // eslint-disable-next-line
     }, [])
 
 
