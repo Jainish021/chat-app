@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
+    "autoprefixer": "^10.4.16",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.13",
     "next": "13.4.13",
@@ -23,7 +24,6 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.15",
     "http-proxy-middleware": "^2.0.6",
     "postcss": "^8.4.27"
   }
