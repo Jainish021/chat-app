@@ -1,17 +1,19 @@
-import Header from "./Header"
-import FriendSearch from './FriendSearch'
 import { useRouter } from 'next/router'
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux'
-import { setSelectedItem } from '../slices/selectedItemSlice'
 import axios from "axios"
+import Header from "./Header"
+import FriendSearch from './FriendSearch'
+import Profile from './Profile'
+import { setSelectedItem } from '../slices/selectedItemSlice'
 
 export default function Sidebar() {
     const router = useRouter()
     const dispatch = useDispatch()
     const selectedItem = useSelector((state) => state.selectedItem)
     const [friendSearchVisibility, setFriendSearchVisibility] = useState(false)
+    const [profileVisibility, setProfileVisibility] = useState(false)
     const [list, setList] = useState([])
 
     useEffect(() => {
@@ -42,6 +44,11 @@ export default function Sidebar() {
     }
 
 
+    function profile() {
+        setProfileVisibility(prev => !prev)
+    }
+
+
     function AddFriend() {
         return (
             <div className="flex flex-col min-h-[calc(100vh-120px)] items-center text-slate-300">
@@ -54,7 +61,9 @@ export default function Sidebar() {
     }
 
     function selectChat(item) {
-        dispatch(setSelectedItem(item))
+        if (item?._id !== selectedItem._id) {
+            dispatch(setSelectedItem(item))
+        }
     }
 
     function Friends() {
@@ -66,11 +75,11 @@ export default function Sidebar() {
                 }
             >
                 <Image
-                    src={listItem.avatar || '/userImage.png'}
+                    src={listItem.avatar ? `data:image/png;base64, ${listItem.avatar}` : '/userImage.png'}
                     width={40}
                     height={30}
                     alt=''
-                    className='rounded-full bg-white m-[2%] w-auto h-auto'
+                    className='rounded-full bg-white m-[2%]'
                     loading="lazy"
                 ></Image >
                 <div className='text-xl mx-[10%] my-auto'>
@@ -93,10 +102,22 @@ export default function Sidebar() {
                         setFriendSearchVisibility={setFriendSearchVisibility}
                     />
                     :
-                    <>
-                        <Header friendSearch={friendSearch} />
-                        {list.length > 0 ? <Friends /> : <AddFriend />}
-                    </>
+                    profileVisibility
+                        ?
+                        <>
+                            <Profile
+                                profile={profile}
+                            />
+                        </>
+                        :
+                        <>
+                            <Header
+                                friendSearch={friendSearch}
+                                profile={profile}
+                            />
+                            {list.length > 0 ? <Friends /> : <AddFriend />}
+                        </>
+
             }
         </>
     )

@@ -1,9 +1,10 @@
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 import Title from '../components/Title'
 import { v4 } from 'uuid'
+
 
 export default function Chatbox() {
     const selectedItem = useSelector((state) => state.selectedItem)
@@ -11,6 +12,7 @@ export default function Chatbox() {
     const [errorLabel, setErrorLabel] = useState("")
     const [newMessage, setNewMessage] = useState("")
     const [messages, setMessages] = useState([])
+    const scrollableElementRef = useRef(null)
 
 
     useEffect(() => {
@@ -20,21 +22,30 @@ export default function Chatbox() {
         }
     }, [selectedItem])
 
+
     useEffect(() => {
-        console.log(messages)
         DisplayMessage()
+        scrollToBottom()
     }, [messages])
+
+
+    function scrollToBottom() {
+        if (scrollableElementRef.current) {
+            scrollableElementRef.current.scrollTop = scrollableElementRef.current.scrollHeight
+        }
+    }
+
 
     async function fetchMessages() {
         setErrorLabel("")
         try {
             const fetchData = await axios.post('/chats/getMessages', { receiverId: selectedItem._id }).then(res => res.data)
             setMessages(fetchData)
-            console.log(fetchData)
         } catch (e) {
             setErrorLabel("Failed to fetch latest messages.")
         }
     }
+
 
     function getMessageTime(timestamp) {
         const messageDate = new Date(timestamp)
@@ -62,6 +73,7 @@ export default function Chatbox() {
         return messageDate.toLocaleDateString(undefined, options)
     }
 
+
     function timeFormatter(timestamp) {
         const date = new Date(timestamp)
 
@@ -74,21 +86,24 @@ export default function Chatbox() {
         return <p className='text-xs self-end ml-3'>{formattedTime}</p>
     }
 
+
     function DisplayMessage() {
-        console.log(messages.length)
         if (messages.length > 0) {
             const formattedMessages = []
             let prevDate = ""
+            let prevMessageSender = ""
+
             for (let i = 0; i < messages.length; i++) {
                 const message = messages[i]
                 const messageClass = message?.senderId === selectedItem._id ? "bg-gray-900" : "bg-gray-700 self-end"
+                const marginTop = prevMessageSender === message.senderId ? "mt-[0.25%]" : "mt-[0.5%]"
                 const messageDate = getMessageTime(message.createdAt)
 
                 formattedMessages.push(
                     <div className='flex flex-col' key={message._id}>
                         {messageDate !== prevDate ? <p className='self-center bg-violet-700 text-sm px-2 rounded mt-[1%]'>{messageDate}</p> : ""}
                         <div className='flex flex-col'>
-                            <div className={`flex w-fit px-[1%] rounded m-[0.5%] ${messageClass}`}>
+                            <div className={`flex w-fit px-[1%] rounded mx-[0.5%] ${marginTop} ${messageClass}`}>
                                 {/* <span className='w-2 bg-gray-900'>"</span> */}
                                 <p className="text-base py-[2%]">{message.message}</p>
                                 {timeFormatter(message.createdAt)}
@@ -97,6 +112,7 @@ export default function Chatbox() {
                     </div>
                 )
                 prevDate = messageDate
+                prevMessageSender = message.senderId
             }
 
 
@@ -113,6 +129,7 @@ export default function Chatbox() {
             )
         }
     }
+
 
     async function postMessage(e) {
         e.preventDefault()
@@ -135,6 +152,7 @@ export default function Chatbox() {
                     createdAt: new Date().toISOString(),
                 }
                 setMessages(prevMessages => [...prevMessages, msgLocal])
+                scrollToBottom()
                 setNewMessage("")
             } else {
                 setErrorLabel("Could not deliver message. Please try again.")
@@ -149,7 +167,7 @@ export default function Chatbox() {
         return (
             <div className='flex flex-row px-[5%] py-[1%] bg-gray-700 text-slate-300 cursor-pointer'>
                 <Image
-                    src={'/userImage.png'}
+                    src={selectedItem.avatar ? `data:image/png;base64, ${selectedItem.avatar}` : ""}
                     width={40}
                     height={40}
                     alt=''
@@ -162,6 +180,7 @@ export default function Chatbox() {
             </div>
         )
     }
+
 
     function InputBox() {
         return (
@@ -178,6 +197,7 @@ export default function Chatbox() {
         )
     }
 
+
     return (
         <>
             {
@@ -193,7 +213,7 @@ export default function Chatbox() {
                             <div className='h-[10%]'>
                                 <ChatBoxHeader />
                             </div>
-                            <div className='h-[calc(100vh-160px)] overflow-auto'>
+                            <div className='h-[calc(100vh-160px)] overflow-auto' ref={scrollableElementRef}>
                                 <DisplayMessage />
                             </div>
                             <div className='h-[10%]'>

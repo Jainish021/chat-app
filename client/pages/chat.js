@@ -2,6 +2,9 @@ import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import axios from "axios"
+import { useDispatch } from 'react-redux'
+import { setUserInformation } from '../slices/userInformationSlice'
+import io from 'socket.io-client'
 import Loading from "../components/Loading"
 import Sidebar from '../components/Sidebar'
 import Chatbox from '../components/Chatbox'
@@ -10,8 +13,14 @@ import HeadComponent from '../components/HeadComponent'
 
 export default function Chat() {
     const router = useRouter()
-    const sharedData = useSelector((state) => state.sharedData)
-    const [userInformation, setUserInformation] = useState(sharedData)
+    const dispatch = useDispatch()
+    // const socket = io.connect(process.env.PORT || ':3001')
+    // socket.on('message', (data) => {
+    //     console.log('Received message from server:', data);
+    // })
+    // socket.emit('message')
+    const userInformation = useSelector((state) => state.userInformation)
+    const [userInfo, setUserInfo] = useState(userInformation)
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
@@ -29,13 +38,14 @@ export default function Chat() {
                 if (userDetails.error) {
                     router.push('/login')
                 }
-                setUserInformation(userDetails)
+                setUserInfo(userDetails)
+                dispatch(setUserInformation(userDetails))
             } catch (e) {
                 router.push('/login')
             }
         }
 
-        token && !userInformation?._id && fetchUserDetails()
+        token && !userInfo?._id && fetchUserDetails()
         setIsLoading(false)
     }, [])
 

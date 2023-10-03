@@ -89,7 +89,7 @@ export default function FriendSearch(props) {
         <>
             <div className='flex flex-row items-center'>
                 <p
-                    className='text-violet-500 text-center text-4xl font-bold w-[10%] cursor-pointer transition-transform transform hover:scale-110 focus:outline-none active:scale-100'
+                    className='ml-[2%] text-slate-300 text-center text-4xl font-bold w-[10%] cursor-pointer transition-transform transform hover:scale-110 focus:outline-none active:scale-100'
                     onClick={props.friendSearch}
                 >
                     &larr;

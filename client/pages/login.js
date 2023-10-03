@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
-import { setSharedData } from '../slices/sharedDataSlice'
+import { setUserInformation } from '../slices/userInformationSlice'
 import Loading from "../components/Loading"
 import HeadComponent from '../components/HeadComponent'
 import Title from '../components/Title'
@@ -26,7 +26,7 @@ export default function Login() {
         const fetchUser = async () => {
             try {
                 const userDetails = await axios.get("/users/me").then(res => res.data)
-                dispatch(setSharedData(userDetails))
+                dispatch(setUserInformation(userDetails))
                 router.push('/chat')
             } catch (e) {
                 setIsLoading(false)
@@ -57,7 +57,7 @@ export default function Login() {
             const userDetails = await axios.post("/users/login", formData).then(res => res.data)
             localStorage.setItem("token", userDetails.token)
             setErrorLabel("")
-            dispatch(setSharedData(userDetails.user))
+            dispatch(setUserInformation(userDetails.user))
             router.push('/chat')
         } catch (e) {
             setErrorLabel("Unable to login. Enter correct Email-Password.")
