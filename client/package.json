@@ -19,12 +19,12 @@
     "react-redux": "^8.1.2",
     "socket.io-client": "^4.7.2",
     "swr": "^2.2.1",
+    "tailwindcss": "^3.3.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.15",
     "http-proxy-middleware": "^2.0.6",
-    "postcss": "^8.4.27",
-    "tailwindcss": "^3.3.3"
+    "postcss": "^8.4.27"
   }
 }
